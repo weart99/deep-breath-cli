@@ -103,12 +103,15 @@ def test_breath_command_invalid_pattern(mock_track, mock_sleep, mock_confirm):
     """Test the breath command with invalid pattern."""
     mock_confirm.return_value = True
     mock_track.side_effect = lambda x, **kwargs: x
-    
+
     runner = CliRunner()
     result = runner.invoke(app, ["start", "--cycle", "2", "--pattern", "inexistant"])
-    
+
     assert result.exit_code == 0
-    assert "Pattern 'inexistant' not found. Using default pattern '4-7-8'." in result.stdout
+    assert (
+        "Pattern 'inexistant' not found. Using default pattern '4-7-8'."
+        in result.stdout
+    )
     assert mock_sleep.call_count == 39
 
 
@@ -119,11 +122,10 @@ def test_breath_command_cycle_less_than_one(mock_track, mock_sleep, mock_confirm
     """Test the breath command with cycle < 1."""
     mock_confirm.return_value = True
     mock_track.side_effect = lambda x, **kwargs: x
-    
+
     runner = CliRunner()
     result = runner.invoke(app, ["start", "--cycle", "0"])
-    
+
     assert result.exit_code == 0
     assert "Cycle must be at least 1. Setting to 1." in result.stdout
     assert mock_sleep.call_count == 20
-
