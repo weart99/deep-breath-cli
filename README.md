@@ -4,61 +4,111 @@
 
 ## 🌬️ What is Deep Breath CLI?
 
-Whether you're coding, studying, or just need a quick break, Deep Breath CLI offers a variety of relaxation techniques and exercises. With simple commands, you can access guided breathing, mindfulness prompts, and other quick activities to help you reset and recharge.
+Whether you're coding, studying, or just need a quick break, Deep Breath CLI offers guided breathing exercises with visual progress bars and calming colors. With simple commands, you can access different breathing patterns to help you reset and recharge.
 
 ## 🚀 Features
 
-- Guided breathing exercises
-- Mindfulness and focus prompts
-- Quick energy-boosting routines
-- Customizable session lengths and styles (coming soon)
-- More relaxation techniques to be added!
+- Multiple breathing patterns (4-7-8, Box breathing)
+- Visual progress bars with calming colors
+- Customizable session lengths and cycles
+- Clear, distraction-free interface
+- Easy preset management
 
 ## 🛠️ Installation
 
-> **Note:** Deep Breath CLI is under active development. Installation instructions will be provided soon.
+Install from PyPI:
 
-## ⚡ Usage
-
-Once installed, you’ll be able to run:
-
-```sh
-deep-breath [OPTIONS]
+```bash
+pip install deep-breath-cli
 ```
 
-### Example
+## ⚡️ Usage
 
-```sh
-deep-breath
+### Start a breathing session
+
+```bash
+# Default session (4 cycles of 4-7-8 pattern)
+breath start
+
+# Custom number of cycles
+breath start --cycle 8
+
+# Different breathing pattern
+breath start --pattern "4-4-4-4"
+
+# Combined options
+breath start --cycle 6 --pattern "4-4-4-4"
 ```
 
-This will launch the default relaxation exercise.
+### View available patterns
 
-### Options
+```bash
+breath presets
+```
 
-*To be determined as features are added.*
+Output:
+
+```plaintext
+Available breathing patterns:
+  4-7-8: 4s Breathe in..., 7s Hold..., 8s Breathe out...
+  4-4-4-4: 4s Breathe in..., 4s Hold..., 4s Breathe out..., 4s Hold...
+
+You can use these patterns with the --pattern option.
+```
+
+### Get help
+
+```bash
+breath --help
+breath start --help
+```
+
+## 🌟 Breathing Patterns
+
+- **4-7-8**: Relaxation pattern (inhale 4s, hold 7s, exhale 8s)
+- **4-4-4-4**: Box breathing for focus (inhale 4s, hold 4s, exhale 4s, hold 4s)
+- **More to come**
 
 ## 🤔 Why use Deep Breath CLI?
 
-- **Quick:** Take a break without leaving your terminal.
-- **Effective:** Scientifically-backed techniques for relaxation and focus.
-- **Customizable:** Choose the exercise and duration that fits your needs (coming soon).
+- **Quick:** Take a break without leaving your terminal
+- **Effective:** Scientifically-backed breathing techniques
+- **Customizable:** Choose the pattern and duration that fits your needs
+- **Distraction-free:** Clear your mind with simple, focused interface
 
-## 📝 Roadmap
+## 🛠️ Development
 
-- [ ] Add argument parsing for different exercises and durations
-- [ ] Implement multiple relaxation techniques
-- [ ] Add sound or visual cues (optional)
-- [ ] Cross-platform support
+### Setup
 
-## 💡 Contributing
+```bash
+git clone https://github.com/weart99/deep-breath-cli
+cd deep-breath-cli
+uv sync --extra dev
+```
 
-Contributions are welcome! Please open an issue or submit a pull request with your ideas or improvements.
+### Running tests
+
+```bash
+uv run pytest tests/ --cov=src
+```
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and ensure they pass
+5. Submit a pull request
 
 ## 📄 License
 
-MIT License
+[MIT Licence](https://choosealicense.com/licenses/mit/)
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
+
+## Authors
+
+[@weart99](https://www.github.com/weart99)
 
 ---
 
-Take a deep breath, and let’s get started!
+Take a deep breath, and let's get started! 🌬️
