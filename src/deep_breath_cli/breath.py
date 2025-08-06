@@ -4,6 +4,7 @@ import typer
 from rich.console import Console
 from rich.progress import track
 from typing_extensions import Annotated
+from .stats import StatsManager
 
 
 PATTERNS: dict[str, list[tuple[int, str]]] = {
@@ -46,6 +47,20 @@ def presets():
     )
 
 
+@app.command("stats")
+def stats():
+    """Display breathing session statistics."""
+    stats_manager = StatsManager()
+    print(stats_manager.get_display_stats())
+    # console = Console()
+    # console.print("Breathing Session Statistics:", style="bold")
+    # console.print(f"Total Sessions: {stats_manager.data['total_sessions']}")
+    # console.print(
+    #     f"Total Time: {stats_manager.data['total_time_seconds']} seconds"
+    # )
+    # console.print("Patterns Used:")
+
+
 @app.command("start")
 def breath(
     cycle: Annotated[
@@ -74,6 +89,13 @@ def breath(
         for duration, message in PATTERNS[pattern]:
             breath_phase(duration, message)
         os.system("clear")
+
+    # Caclulate session duration
+    pattern_duration = sum(duration for duration, _ in PATTERNS[pattern])
+    total_duration = cycle * pattern_duration
+
+    stats_manager = StatsManager()
+    stats_manager.add_session(pattern, cycle, total_duration)
     print("Cycle complete! Take a moment to relax.")
 
 
