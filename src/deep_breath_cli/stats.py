@@ -81,7 +81,7 @@ class StatsManager:
         # Calculate total time in a user-friendly format
         total_time_seconds = self.data["total_time_seconds"]
         total_time_minutes = total_time_seconds // 60
-        
+
         if total_time_minutes < 1:
             time_display = f"{total_time_seconds} seconds"
         elif total_time_minutes < 60:
