@@ -4,6 +4,8 @@ import typer
 from rich.console import Console
 from rich.progress import track
 from typing_extensions import Annotated
+from .presets import PresetManager
+from .stats import StatsManager
 
 
 PATTERNS: dict[str, list[tuple[int, str]]] = {
@@ -35,15 +37,48 @@ def presets():
     """Display available breathing patterns."""
     console = Console()
     console.print("Available breathing patterns:", style="bold")
-    for pattern, phases in PATTERNS.items():
+    preset_manager: PresetManager = PresetManager()
+    all_presets: dict[str, tuple[list[tuple[int, str]], str]] = (
+        preset_manager.get_all_presets()
+    )
+
+    for pattern, (phases, preset_type) in all_presets.items():
         phases_display: list = []
         for duration, message in phases:
             phases_display.append(f"{duration}s {message}")
         phases_str = "[white], ".join(phases_display)
-        console.print(f"  {pattern}: {phases_str}")
+        console.print(f"  {pattern}: {phases_str} [white]({preset_type})")
     console.print(
         "\nYou can use these patterns with the --pattern option.", style="dim"
     )
+
+
+@app.command("create-pattern")
+def create_pattern(name: str):
+    """Create a new breathing pattern interactively."""
+    preset_manager = PresetManager()
+    preset_manager.create_interactive_preset(name)
+
+
+@app.command("delete-pattern")
+def delete_pattern(name: str):
+    """Delete a custom breathing pattern."""
+    preset_manager = PresetManager()
+    preset_manager.delete_preset(name)
+
+
+@app.command("modify-pattern")
+def modify_pattern(name: str):
+    """Modify an existing custom breathing pattern."""
+    preset_manager = PresetManager()
+    preset_manager.modify_preset(name)
+
+
+@app.command("stats")
+def stats():
+    """Display breathing session statistics."""
+    stats_manager = StatsManager()
+    print(stats_manager.get_display_stats())
 
 
 @app.command("start")
@@ -64,16 +99,30 @@ def breath(
     print(f"Starting a breathing cycle of {cycle} cycles...")
     time.sleep(2)
 
-    if pattern not in PATTERNS:
+    preset_manager: PresetManager = PresetManager()
+    all_presets: dict[str, tuple[list[tuple[int, str]], str]] = (
+        preset_manager.get_all_presets()
+    )
+
+    if pattern not in all_presets:
         print(f"Pattern '{pattern}' not found. Using default pattern '4-7-8'.")
         pattern = "4-7-8"
 
     for cycle_number in range(cycle):
         os.system("clear")  # Clear the console for better visibility
         print(f"Cycle {cycle_number + 1} of {cycle}:")
-        for duration, message in PATTERNS[pattern]:
+        phases, _ = all_presets[pattern]
+        for duration, message in phases:
             breath_phase(duration, message)
         os.system("clear")
+
+    # Caclulate session duration
+    phases, _ = all_presets[pattern]
+    pattern_duration = sum(duration for duration, _ in phases)
+    total_duration = cycle * pattern_duration
+
+    stats_manager = StatsManager()
+    stats_manager.add_session(pattern, cycle, total_duration)
     print("Cycle complete! Take a moment to relax.")
 
 
