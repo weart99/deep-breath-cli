@@ -93,7 +93,10 @@ def stats(
 @app.command("export-stats")
 def export_stats(
     format: Annotated[
-        str, typer.Option("--format", "-f", help="The format to export the stats to (json or csv).")
+        str,
+        typer.Option(
+            "--format", "-f", help="The format to export the stats to (json or csv)."
+        ),
     ] = "json",
     output_path: Annotated[
         str, typer.Option("--output", "-o", help="The name of the exporting file.")
