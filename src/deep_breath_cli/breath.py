@@ -75,10 +75,33 @@ def modify_pattern(name: str):
 
 
 @app.command("stats")
-def stats():
+def stats(
+    detailed: Annotated[
+        bool,
+        typer.Option("--detailed", "-d", help="Show detailed stats with charts"),
+    ] = False,
+):
     """Display breathing session statistics."""
     stats_manager = StatsManager()
-    print(stats_manager.get_display_stats())
+    if detailed:
+        print(stats_manager.get_detailed_stats())
+    else:
+        print(stats_manager.get_display_stats())
+        print("\nUse 'breath stats --detailed' for charts and advanced analytics.")
+
+
+@app.command("export-stats")
+def export_stats(
+    format: Annotated[
+        str, typer.Option("--format", "-f", help="The format to export the stats to (json or csv).")
+    ] = "json",
+    output_path: Annotated[
+        str, typer.Option("--output", "-o", help="The name of the exporting file.")
+    ] = "",
+):
+    """Export breathing session statistics."""
+    stats_manager = StatsManager()
+    stats_manager.export_stats(format, output_path)
 
 
 @app.command("start")
