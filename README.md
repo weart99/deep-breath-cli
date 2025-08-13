@@ -1,5 +1,11 @@
 # Deep Breath CLI
 
+![PyPI version](https://badge.fury.io/py/deep-breath-cli.svg)
+![Python versions](https://img.shields.io/pypi/pyversions/deep-breath-cli.svg)
+![Build Status](https://github.com/weart99/deep-breath-cli/actions/workflows/ci.yml/badge.svg)
+![Publication Status](https://github.com/weart99/deep-breath-cli/actions/workflows/publish.yml/badge.svg)
+![License](https://img.shields.io/pypi/l/deep-breath-cli.svg)
+
 **Deep Breath CLI** is a command-line tool designed to help you relax, regain focus, and boost your energy—right from your terminal.
 
 ## 🌬️ What is Deep Breath CLI?
@@ -67,6 +73,7 @@ You can use these patterns with the --pattern option.
 Monitor your breathing journey with detailed statistics:
 
 ```bash
+# Basic stats overview
 breath stats
 ```
 
@@ -78,7 +85,39 @@ Your Breathing Stats
             Total time: 2 minutes
             Favorite pattern: 4-4-4-4 (2 sessions)
             Current streak: 2 days
+
+Use 'breath stats --detailed' for charts and advanced analytics.
 ```
+
+## Advanced statistics
+
+The `--detailed` flag shows beautiful ASCII charts including:
+
+- **Sessions over last 7 days**: Visual timeline of your daily practice
+- **Pattern usage distribution**: See which breathing techniques you use most
+
+```bash
+# Detailed view with beautiful ASCII charts
+breath stats --detailed
+```
+
+## Export your statistics
+
+Export your breathing data for external analysis or backup:
+
+```bash
+# Export complete data as JSON
+breath export-stats --format json
+
+# Export session data as CSV
+breath export-stats --format csv
+
+# Custom output file
+breath export-stats --format json --output my_backup.json
+```
+
+**CSV Export includes:** Date, Pattern, Cycles, Duration (seconds)  
+**JSON Export includes:** Complete statistics with all session details
 
 ## Custom patterns
 

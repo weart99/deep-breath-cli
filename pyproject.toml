@@ -1,6 +1,6 @@
 [project]
 name = "deep-breath-cli"
-version = "1.0.0"
+version = "1.1.0"
 description = "A command-line tool designed to help you relax from your terminal."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -20,6 +20,7 @@ classifiers = [
     "Environment :: Console",
 ]
 dependencies = [
+    "plotext>=5.3.2",
     "rich>=14.1.0",
     "typer>=0.16.0",
 ]

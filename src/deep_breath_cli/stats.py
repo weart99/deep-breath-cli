@@ -1,4 +1,5 @@
 import json
+import plotext as plt
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Any
@@ -102,7 +103,7 @@ class StatsManager:
             Total sessions: {self.data["total_sessions"]}
             Total time: {time_display}
             Favorite pattern: {favorite_pattern} ({favorite_count} sessions)
-            Current streak: {self.data["streaks"]["current"]} days"""
+            Current streak: {self.data["streaks"]["current"]} days (Longest: {self.data["streaks"]["longest"]} days)"""
 
     def _calculate_streak(self) -> int:
         """Calculate current streak of consecutive days."""
@@ -110,29 +111,134 @@ class StatsManager:
             return 0  # No sessions means no streak
 
         # Get the unique dates from sessions
-        unique_dates = set(session["date"] for session in self.data["sessions"])
-
-        # Convert dates to datetime objects
-        date_objects = [datetime.strptime(date, "%Y-%m-%d") for date in unique_dates]
-
-        # Sort dates in descending order
-        date_objects.sort(reverse=True)
+        session_dates = set(session["date"] for session in self.data["sessions"])
 
         # Check if the last session was today
         today = datetime.now().date()
-        if date_objects[0].date() != today:
-            return 0  # Streak broken if last session is not today
 
-        # Count consecutive days
-        streak = 1
-        expected_date = today
+        streak = 0
+        current_date = today
 
-        for i in range(1, len(date_objects)):
-            expected_date -= timedelta(days=1)  # Move to the previous day
-
-            if date_objects[i].date() == expected_date:
-                streak += 1  # Increment streak if the date matches
-            else:
-                break  # Stop counting if a day is missing
+        # Check backwards day by day for consecutive sessions
+        while current_date.strftime("%Y-%m-%d") in session_dates:
+            streak += 1
+            current_date = current_date - timedelta(days=1)
 
         return streak
+
+    def _generate_sessions_chart(self) -> str:
+        """Generate ASCII chart of sessions in last 7 days."""
+
+        # Get last 7 days
+        today = datetime.now().date()
+        last_week = [
+            (today - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(6, -1, -1)
+        ]
+
+        # Count sessions per day
+        daily_counts = []
+        day_labels = []
+
+        for day in last_week:
+            count = sum(
+                1 for session in self.data["sessions"] if session["date"] == day
+            )
+            daily_counts.append(count)
+            # Format label (Mon, Tue, etc.)
+            day_obj = datetime.strptime(day, "%Y-%m-%d")
+            day_labels.append(day_obj.strftime("%a"))
+
+        # Generate chart with plotext
+        plt.clear_data()
+
+        # Color personalization
+        plt.canvas_color("black")  # Background color
+        plt.axes_color("black")  # Axes color
+        plt.ticks_color("white")  # Graduations
+
+        plt.bar(day_labels, daily_counts, color="cyan+")
+        plt.title("Sessions Last 7 Days")
+        plt.plot_size(50, 10)  # Chart width
+
+        chart_string = plt.build()
+        plt.clear_data()
+
+        return chart_string
+
+    def _generate_patterns_chart(self) -> str:
+        """Generate ASCII chart of pattern usage."""
+        if not self.data["patterns_used"]:
+            return "No pattern data available."
+
+        # Préparer les données
+        patterns = list(self.data["patterns_used"].keys())
+        counts = list(self.data["patterns_used"].values())
+
+        # Generate chart
+        plt.clear_data()
+        plt.canvas_color("black")
+        plt.axes_color("black")
+        plt.ticks_color("white")
+
+        plt.bar(patterns, counts, color="cyan+")
+        plt.title("Pattern Usage")
+        plt.plot_size(50, 8)
+
+        chart_string = plt.build()
+        plt.clear_data()
+        return chart_string
+
+    def get_detailed_stats(self) -> str:
+        """Format detailed stats with charts for display in terminal."""
+        basic = self.get_display_stats()
+
+        # Add graphics
+        sessions_chart = self._generate_sessions_chart()
+        patterns_chart = self._generate_patterns_chart()
+        return f"{basic}\n\n{sessions_chart}\n\n{patterns_chart}"
+
+    def export_stats(self, format: str = "json", output_path: str = "") -> None:
+        """Export stats to JSON or CSV format."""
+        if format not in ["json", "csv"]:
+            print("Invalid format. Please choose 'json' or 'csv'.")
+            return
+
+        # Generate the default filename
+        if not output_path:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_path = f"breathing_stats_{timestamp}.{format}"
+
+        try:
+            if format == "json":
+                self._export_json(output_path)
+            elif format == "csv":
+                self._export_csv(output_path)
+
+            print(f"Stats exported to: {output_path}")
+        except Exception as e:
+            print(f"Error exporting stats: {e}")
+
+    def _export_json(self, output_path: str) -> None:
+        """Export sessions data as JSON."""
+        with open(output_path, "w") as f:
+            json.dump(self.data, f, indent=2)
+
+    def _export_csv(self, output_path: str) -> None:
+        """Export sessions data as CSV."""
+        import csv
+
+        with open(output_path, "w", newline="") as f:
+            writer = csv.writer(f, delimiter=";")
+            # Headers
+            writer.writerow(["Date", "Pattern", "Cycles", "Duration (seconds)"])
+
+            # Data rows
+            for session in self.data["sessions"]:
+                writer.writerow(
+                    [
+                        session["date"],
+                        session["pattern"],
+                        session["cycles"],
+                        session["duration_seconds"],
+                    ]
+                )
