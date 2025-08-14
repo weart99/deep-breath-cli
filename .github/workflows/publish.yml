@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'  # Trigger on version tags that start with 'v'
+    branches:
+      - main  # Only on main branch
 
 jobs:
   publish:
