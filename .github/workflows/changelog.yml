@@ -1,5 +1,8 @@
 name: Update Changelog
 
+permissions:
+  contents: write
+
 on:
   push:
     tags:
@@ -11,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Récupère tout l'historique
+        fetch-depth: 0  # Get the history
     
     - name: Generate Changelog
       uses: mikepenz/release-changelog-builder-action@v4
